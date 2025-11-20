@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Physical & Natural Sciences | Environmental Careers Game</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .mission-title {
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+        .mission-scene {
+            font-size: 0.9rem;
+            color: #4b5563;
+            margin-bottom: 1rem;
+        }
+        .mission-progress {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-bottom: 0.7rem;
+        }
+        .choice-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.65rem;
+            margin-bottom: 1rem;
+        }
+        .choice-btn {
+            width: 100%;
+            text-align: left;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            padding: 0.7rem 0.8rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+        }
+        .choice-btn span {
+            display: block;
+        }
+        .choice-label {
+            font-weight: 500;
+            margin-bottom: 0.15rem;
+        }
+        .choice-desc {
+            font-size: 0.85rem;
+            color: #4b5563;
+        }
+        .choice-btn:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+        }
+        .pill-row span {
+            display: inline-block;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            margin-right: 0.3rem;
+            margin-bottom: 0.3rem;
+            background: #e5f3ff;
+        }
+        .summary-step {
+            padding: 0.5rem 0.6rem;
+            border-radius: 10px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 0.5rem;
+            font-size: 0.87rem;
+        }
+        .summary-step strong {
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+        .rank-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            margin-right: 0.4rem;
+        }
+        .rank-1 { background:#dcfce7; color:#166534; }
+        .rank-2 { background:#e0f2fe; color:#075985; }
+        .rank-3 { background:#fef9c3; color:#854d0e; }
+
+        .game-scenario-row {
+            margin: 0.9rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .game-scenario-label {
+            font-weight: 500;
+            color: #4b5563;
+        }
+        .game-scenario-select {
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            border: 1px solid #d1d5db;
+            font-size: 0.85rem;
+            background: #ffffff;
+        }
+        .game-stats {
+            margin-top: 1rem;
+            padding: 1rem 1.1rem;
+            border-radius: 18px;
+            border: 1px solid rgba(191, 146, 100, 0.35);
+            background: rgba(255,255,255,0.85);
+        }
+        .game-stats h4 {
+            margin-bottom: 0.4rem;
+        }
+        .game-stats p {
+            font-size: 0.85rem;
+            color: #4b5563;
+            margin-bottom: 0.8rem;
+        }
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .bar-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .bar-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        .bar-track {
+            width: 100%;
+            height: 10px;
+            border-radius: 999px;
+            background: #e5e7eb;
+            position: relative;
+            overflow: hidden;
+        }
+        .bar-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #6F826A, #BF9264);
+            border-radius: 999px;
+        }
+        .bar-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Department of Physical & Natural Sciences</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="index.html" class="sidebar-link">Home</a>
+            <a href="introduction.html" class="sidebar-link">Introduction</a>
+            <a href="content.html" class="sidebar-link">Programmes</a>
+            <a href="research.html" class="sidebar-link">Research</a>
+            <a href="faculty.html" class="sidebar-link">Faculty</a>
+            <a href="news.html" class="sidebar-link">News</a>
+            <a href="projects.html" class="sidebar-link">Student Projects</a>
+            <a href="gallery.html" class="sidebar-link">Image Gallery</a>
+            <a href="career-pathways.html" class="sidebar-link">Career Pathways</a>
+            <a href="careers-game.html" class="sidebar-link active">Career Game</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-footer-label">Contact</div>
+            <div class="sidebar-footer-text">
+                FLAME University, Lavale, Pune<br>
+example@flame.edu.in<br>
+                +91 98765 43210
+            </div>
+        </div>
+    </aside>
+
+    <div class="layout-main">
+        <header class="top-header">
+            <button class="sidebar-toggle" type="button" aria-label="Toggle navigation">
+                ☰
+            </button>
+        
+            <div class="top-header-title">
+                Career Game
+            </div>
+        
+            <a href="https://www.flame.edu.in" class="header-logo-link">
+                <img src="images/base/flame-logo.png" alt="FLAME University logo" class="header-logo">
+            </a>
+        </header>
+
+        <main>
+            <section class="hero">
+                <h1 id="game-hero-title"></h1>
+                <p id="game-hero-text"></p>
+            </section>
+
+            <section class="section">
+                <div class="game-container">
+                    <h2 id="game-intro-title"></h2>
+                    <p class="game-sub" id="game-intro-text"></p>
+
+                    <div class="game-scenario-row">
+                        <span class="game-scenario-label">Scenario:</span>
+                        <select id="scenario-select" class="game-scenario-select"></select>
+                    </div>
+
+                    <div class="btn-row" style="margin-bottom:1rem;">
+                        <button class="btn btn-primary" id="start-btn">Start</button>
+                        <button class="btn btn-outline" id="restart-btn">Restart</button>
+                    </div>
+
+                    <div id="mission-box" class="hidden">
+                        <p class="mission-progress" id="mission-progress"></p>
+                        <p class="mission-title" id="mission-title"></p>
+                        <p class="mission-scene" id="mission-scene"></p>
+
+                        <div class="choice-list" id="choice-list"></div>
+                    </div>
+
+                    <div id="results-box" class="hidden">
+                        <div class="game-result">
+                            <h3>Your suggested environmental pathways</h3>
+                            <p id="result-intro" style="font-size:0.9rem; margin-bottom:0.6rem;"></p>
+                            <div id="top-careers"></div>
+
+                            <div id="results-stats" class="game-stats hidden">
+                                <h4>Score highlights</h4>
+                                <p>These were the top pathways from this play-through.</p>
+                                <div id="top-fields-chart" class="bar-chart"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:1.1rem;">
+                            <h4 style="margin-bottom:0.4rem;">How your story unfolded</h4>
+                            <div id="story-summary"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-container">
+                <div class="footer-section">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="introduction.html">Introduction</a></li>
+                        <li><a href="content.html">Programmes</a></li>
+                        <li><a href="research.html">Research</a></li>
+                        <li><a href="careers-game.html">Careers Game</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li>Email: <a href="mailto:gurpreet.virk@flame.edu.in">example@flame.edu.in</a></li>
+                        <li>Phone: +91 98765 43210</li>
+                        <li>FLAME University, Lavale, Pune</li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Follow Us</h4>
+                    <div class="footer-social">
+                        <a href="#" title="Instagram">Instagram</a>
+                        <a href="#" title="Twitter/X">Twitter</a>
+                        <a href="#" title="YouTube">Youtube</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                Department of Physical & Natural Sciences
+            </div>
+        </footer>
+    </div>
+</div>
+
+<script src="content-loader.js"></script>
+</body>
+</html>

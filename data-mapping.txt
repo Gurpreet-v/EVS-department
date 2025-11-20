@@ -1,0 +1,136 @@
+Data Mapping the sheet tabs to site sections
+
+
+Reference sheet URL (same as `SHEET_BASE` in `content-loader.js`):
+https://docs.google.com/spreadsheets/d/1RZ7LsGXl2GQtlp_H_kysMmDldKF4uGv5QD_KAzQHTKg/edit
+
+(Use the tab *name* listed below when editing the spreadsheet.)
+
+
+Home (`index.html`)
+-------------------
+1. **homeGlance**  
+   - Columns used: `title`, `text`.  
+   - Populates the “At a Glance” cards via `#glance-grid`.
+2. **homeExplore**  
+   - Columns: `title`, `text`, `button_label`, `button_href`.  
+   - Drives the Explore CTA cards (`#explore-grid`).
+3. **homeTestimonials**  
+   - Columns: `group`, `name`, `text`, `role`, `programme`, `tags`.  
+   - Creates the testimonial cards and filter logic (`#testimonial-grid`).
+
+
+Introduction (`introduction.html`)
+----------------------------------
+- **introContent**  
+  - Columns referenced: `id`, `title`, `text`, `card_title`, `card_text`.  
+  - Supplies hero title/description (`id = hero`), “About” copy (`id = about`), and the Structures/Degrees cards.
+
+
+Programmes (`content.html`)
+---------------------------
+1. **programmesMeta**  
+   - Columns: `id`, `section_id`, `title`, `text`.  
+   - `id` distinguishes blocks (`hero`, `sciences`, `policy`, etc.). `section_id` (when present) lets us target sub-sections such as `sciences_title`.  
+   - Provides the hero title/description (`id = hero`) and the section headings/intros for “Sciences” and “Policy”.
+2. **programmesCards**  
+   - Columns: `section_id`, `title`, `text`, `button_label`, `button_href`.  
+   - Cards are filtered into the “Sciences” or “Policy & Governance” grids based on `section_id` (`sciences` vs `policy`).  
+   - Each card shows `title`, `text`, and an optional CTA button driven by `button_label` / `button_href`.  
+   - Example CSV snippet:
+     ```
+     section_id,title,text,button_label,button_href
+     sciences,Physics Major,Interdisciplinary focus on classical mechanics.,View Curriculum,https://example.com/physics
+     policy,Environmental Policy Minor,Studio courses connecting policy and data.,Learn More,https://example.com/policy
+     ```
+
+
+Research (`research.html`)
+--------------------------
+1. **researchMeta** – hero text (`id = hero`) and intro copy (`id = intro`).
+   - Columns: `id`, `title`, `text`.
+2. **researchAreas** – cards for major research themes.  
+   - Columns: `title`, `text`, `badge_label`.
+3. **researchProjects** – list entries under “Recent projects.”  
+   - Columns: `title`, `text`, `badge_label`.
+
+
+Projects (`projects.html`)
+--------------------------
+1. **projectsMeta**  
+   - Columns: `id`, `title`, `text`.  
+   - Sets hero/introduction copy.
+2. **projectsItems**  
+   - Columns: `title`, `summary`, `level_key`, `theme_key`, `type_key`, `tags`.  
+   - Generates student project cards and powers the level/theme/type filters (matching the `_key` values).
+
+
+Faculty (`faculty.html`)
+------------------------
+- **facultyProfiles**  
+  - Columns: `id`, `name`, `role`, `bio`, `areas`, `email`, `tags`, `modal_sections`, `image_url`, `open_for_student_research`, `short_bio`, `publications`, `advice`, `office`, `website`.  
+  - Supplies the faculty cards, filter pills (from `tags`), and the modal details (parsed from `modal_sections`).
+
+
+News (`news.html`)
+------------------
+1. **newsMeta**  
+   - Columns: `id`, `title`, `text`.  
+   - Hero title/description (`id = hero`) plus intro text (`id = intro`).
+2. **newsItems**  
+   - Columns: `title`, `summary`, `category`, `date_display`, `badge_label`, `link_url`.  
+   - Drives the news cards and category filter chips.
+
+
+Gallery (`gallery.html`)
+------------------------
+1. **galleryMeta** – hero text (`id = hero`) and intro copy (`id = intro`). Columns: `id`, `title`, `text`.
+2. **galleryItems** – columns `title`, `description`, `image_url`, `tag`, `credit`. Used for gallery cards and modal captions.
+
+
+Career Pathways (`career-pathways.html`)
+----------------------------------------
+1. **careerMeta**  
+   - Columns: `id`, `title`, `text`.  
+   - Provides hero title/description (`id = hero`), map intro (`id = map_intro`), and list intro (`id = details_intro`).
+2. **careerNodes**  
+   - Columns: `column`, `type`, `target_id`, `title`, `text`, `order`.  
+   - Every bubble’s heading/body text and its target detail card. `order` controls radial placement.
+3. **careerDetails**  
+   - Columns: `detail_id`, `title`, `intro`, `list_items`.  
+   - Generates the detailed cards (list view) that bubble clicks highlight.
+
+Example CSV (careerNodes + details):
+```
+column,type,target_id,title,text,order
+left,field,detail_field,Ecology Labs,Immersion in ecosystems and biodiversity,1
+right,policy,detail_policy,Urban Planning,Connecting design and governance,2
+
+detail_id,title,intro,list_items
+detail_field,Ecology Research,"Hands-on field studies",Data collection;Lab analysis;Conservation internships
+detail_policy,Urban Policy,"Policy labs and civic partnerships",Qualitative research;City studios;Policy memos
+```
+
+
+Career Game (`careers-game.html`)
+---------------------------------
+1. **gameCareers** – recommendation cards. Columns: `id`, `name`, `desc`, `tags`.  
+2. **gameMissions** – scenarios & missions. Columns: `scenario_id`, `scenario_title`, `scenario_order`, `mission_id`, `mission_order`, `title`, `scene`.  
+3. **gameOptions** – choices & scoring. Columns: `mission_id`, `option_id`, `option_order`, `label`, `desc`, `scores` (semicolon-delimited key:value pairs).
+
+
+Global Page Copy (`pageCopy` tab)
+---------------------------------
+- Columns: `page`, `block`, `title`, `text`. Each row defines a snippet of page copy that is not covered by other tabs.  
+- Currently consumed blocks:
+  * `page = home`, `block = hero` → fills `#home-hero-title` / `#home-hero-text`.  
+  * `page = faculty`, `block = hero` → fills `#faculty-hero-title` / `#faculty-hero-text`.  
+  * `page = introduction`, `block = structures` → fills `#intro-structures-title`.  
+  * `page = game`, `block = hero` → fills `#game-hero-title` / `#game-hero-text`.  
+  * `page = game`, `block = intro` → fills `#game-intro-title` / `#game-intro-text`.
+
+
+Other Notes
+-----------
+- Footer and sidebar contact text are hardcoded in each HTML page (recently updated to show “FLAME University, Lavale, Pune” above the email). Edit the HTML if you need further changes.
+- If a sheet row is missing a value, the UI shows an empty string—no placeholder text remains.
