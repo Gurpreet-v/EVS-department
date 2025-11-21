@@ -109,6 +109,7 @@ function parseScoreString(scoreStr) {
 
 // 1 hour in milliseconds (60 minutes * 60 seconds * 1000 ms)
 const CACHE_DURATION = 60 * 60 * 1000; 
+const NO_CACHE_SHEETS = new Set(["facultyProfiles"]);
 
 let pageCopyCache = null;
 
@@ -118,9 +119,10 @@ async function loadSheet(name) {
 
     const cacheKey = "sheet_data_" + name;
     const now = Date.now();
+    const skipCache = NO_CACHE_SHEETS.has(name);
 
     // --- STEP 1: CHECK CACHE ---
-    const cachedStr = localStorage.getItem(cacheKey);
+    const cachedStr = skipCache ? null : localStorage.getItem(cacheKey);
     
     if (cachedStr) {
         try {
@@ -148,15 +150,17 @@ async function loadSheet(name) {
         const data = parseCSV(text);
 
         // --- STEP 3: SAVE TO CACHE ---
-        try {
-            const cacheItem = {
-                timestamp: now,
-                data: data
-            };
-            // We store the *parsed* data so we don't have to re-parse CSV next time
-            localStorage.setItem(cacheKey, JSON.stringify(cacheItem));
-        } catch (e) {
-            console.warn("LocalStorage full or disabled", e);
+        if (!skipCache) {
+            try {
+                const cacheItem = {
+                    timestamp: now,
+                    data: data
+                };
+                // We store the *parsed* data so we don't have to re-parse CSV next time
+                localStorage.setItem(cacheKey, JSON.stringify(cacheItem));
+            } catch (e) {
+                console.warn("LocalStorage full or disabled", e);
+            }
         }
 
         return data;
@@ -193,6 +197,7 @@ function applyPageCopy(page, block, targets = {}) {
     if (!entry) return;
     if (targets.title && entry.title) targets.title.textContent = entry.title;
     if (targets.text && entry.text) targets.text.textContent = entry.text;
+    if (targets.eyebrow && entry.eyebrow) targets.eyebrow.textContent = entry.eyebrow;
 }
 
 async function populateHomeGlance() {
@@ -473,6 +478,23 @@ function titleCase(str) {
         .join(" ");
 }
 
+function normalizeImageUrl(url) {
+    if (!url) return "";
+    const driveFileMatch = url.match(/https?:\/\/drive\.google\.com\/file\/d\/([^/]+)/);
+    if (driveFileMatch) {
+        return `https://drive.google.com/uc?export=view&id=${driveFileMatch[1]}`;
+    }
+    const driveOpenMatch = url.match(/https?:\/\/drive\.google\.com\/open\?id=([^&]+)/);
+    if (driveOpenMatch) {
+        return `https://drive.google.com/uc?export=view&id=${driveOpenMatch[1]}`;
+    }
+    const driveUcMatch = url.match(/https?:\/\/drive\.google\.com\/uc\?(?:export=\w+&)?id=([^&]+)/);
+    if (driveUcMatch) {
+        return `https://drive.google.com/uc?export=view&id=${driveUcMatch[1]}`;
+    }
+    return url;
+}
+
 async function populateFaculty() {
     const grid = document.querySelector("#profile-grid");
     const filterRow = document.querySelector("#profile-filter-row");
@@ -520,6 +542,7 @@ async function populateFaculty() {
         const website = row.website || "";
         const openForResearch = (row.open_for_student_research || "").trim().toLowerCase();
         const showOpenTag = ["yes", "true", "1"].includes(openForResearch);
+        const imageUrl = normalizeImageUrl(row.image_url || row.image || "");
 
         const initials = (name || "")
             .split(" ")
@@ -531,12 +554,17 @@ async function populateFaculty() {
         const card = document.createElement("article");
         card.className = "profile-card";
         card.dataset.areas = areas.join(" ");
+        card.dataset.image = imageUrl;
 
         card.innerHTML = `
             <div class="profile-header">
+                ${imageUrl ? `
+                <div class="profile-avatar profile-avatar-photo">
+                    <img src="${imageUrl}" alt="${name}" loading="lazy">
+                </div>` : `
                 <div class="profile-avatar placeholder-avatar">
                     <span>${initials}</span>
-                </div>
+                </div>`}
                 <div>
                     <h3 class="profile-name">${name}</h3>
                     <p class="profile-role">${role}</p>
@@ -646,11 +674,12 @@ function setupProfileModal() {
     const modalRole = document.getElementById("profile-modal-role");
     const modalTags = document.getElementById("profile-modal-tags");
     const modalBody = document.getElementById("profile-modal-body");
+    const modalAvatar = document.getElementById("profile-modal-avatar");
     const modalAvatarInitials = document.getElementById("profile-modal-avatar-initials");
     const modalContact = document.getElementById("profile-modal-contact");
     const closeBtn = document.querySelector(".profile-modal-close");
 
-    if (!modalBackdrop || !modalName || !modalRole || !modalTags || !modalBody || !modalAvatarInitials) return;
+    if (!modalBackdrop || !modalName || !modalRole || !modalTags || !modalBody || !modalAvatar) return;
 
     const cards = document.querySelectorAll(".profile-card");
     if (!cards.length) return;
@@ -663,10 +692,26 @@ function setupProfileModal() {
         const initialsEl = card.querySelector(".profile-avatar span");
         const detailEl = card.querySelector(".profile-detail");
         const metaEl = card.querySelector(".profile-meta");
+        const imageUrl = card.dataset.image || "";
 
         modalName.textContent = nameEl ? nameEl.textContent : "";
         modalRole.textContent = roleEl ? roleEl.textContent : "";
-        modalAvatarInitials.textContent = initialsEl ? initialsEl.textContent : "";
+        if (imageUrl) {
+            modalAvatar.classList.add("profile-avatar-photo");
+            let img = modalAvatar.querySelector("img");
+            if (!img) {
+                img = document.createElement("img");
+                modalAvatar.appendChild(img);
+            }
+            img.src = imageUrl;
+            img.alt = modalName.textContent || "Profile photo";
+            if (modalAvatarInitials) modalAvatarInitials.textContent = "";
+        } else {
+            modalAvatar.classList.remove("profile-avatar-photo");
+            const img = modalAvatar.querySelector("img");
+            if (img) img.remove();
+            if (modalAvatarInitials) modalAvatarInitials.textContent = initialsEl ? initialsEl.textContent : "";
+        }
 
         modalTags.innerHTML = "";
         if (tagsRow) {
@@ -1049,7 +1094,7 @@ async function populateGallery() {
 
     // Create gallery items
     rows.forEach(row => {
-        const src = (row.image_src || "").trim();
+        const src = normalizeImageUrl(row.image_src || row.image_url || row.image || "");
         if (!src) return; // skip empty
         const alt = row.alt || "";
         const caption = row.caption || "";
@@ -2103,6 +2148,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     applyPageCopy("game", "intro", {
         title: document.querySelector("#game-intro-title"),
         text: document.querySelector("#game-intro-text")
+    });
+    applyPageCopy("career", "core", {
+        title: document.querySelector("#career-core-title"),
+        eyebrow: document.querySelector("#career-core-eyebrow")
     });
 
     applySavedSidebarState();
